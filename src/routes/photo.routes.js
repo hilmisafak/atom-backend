@@ -1,4 +1,5 @@
 const express = require("express");
+const asyncHandler = require("../utils/asyncHandler");
 
 const router = express.Router();
 
@@ -12,12 +13,12 @@ const {
     updatePhoto,
 } = require("../controllers/photo.controller");
 
-router.get("/", getPhotos);
+router.get("/", asyncHandler(getPhotos));
 
-router.post("/", protect, upload.single("image"), uploadPhoto);
+router.post("/", protect, upload.single("image"), asyncHandler(uploadPhoto));
 
-router.put("/:id", protect, updatePhoto);
+router.put("/:id", protect, upload.single("image"), asyncHandler(updatePhoto));
 
-router.delete("/:id", protect, deletePhoto);
+router.delete("/:id", protect, asyncHandler(deletePhoto));
 
 module.exports = router;

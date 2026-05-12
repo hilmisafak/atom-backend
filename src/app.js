@@ -5,11 +5,11 @@ const rateLimit = require("express-rate-limit");
 
 const authRoutes = require("./routes/auth.routes");
 const photoRoutes = require("./routes/photo.routes");
-const uploadRoutes = require("./routes/upload.routes");
 const errorHandler = require("./middlewares/error.middleware");
 
 const app = express();
 
+app.set("trust proxy", 1);
 app.use(helmet());
 
 app.use(
@@ -41,7 +41,12 @@ app.get("/", (req, res) => {
 
 app.use("/api/auth", authRoutes);
 app.use("/api/photos", photoRoutes);
-app.use("/api/upload", uploadRoutes);
+
+app.use((req, res, next) => {
+  const error = new Error("Endpoint bulunamadı.");
+  error.statusCode = 404;
+  next(error);
+});
 
 app.use(errorHandler);
 

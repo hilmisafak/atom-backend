@@ -1,12 +1,12 @@
 const jwt = require("jsonwebtoken");
 
-const protect = async (req, res, next) => {
+const protect = (req, res, next) => {
     try {
         let token;
 
         if (
             req.headers.authorization &&
-            req.headers.authorization.startsWith("Bearer")
+            req.headers.authorization.toLowerCase().startsWith("bearer")
         ) {
             token = req.headers.authorization.split(" ")[1];
         }
@@ -20,13 +20,20 @@ const protect = async (req, res, next) => {
 
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-        req.admin = decoded;
+        req.admin = {
+            id: decoded.id,
+            username: decoded.username,
+        };
 
         next();
     } catch (error) {
+        const message = error.name === "TokenExpiredError"
+            ? "Token süresi doldu. Lütfen tekrar giriş yapın."
+            : "Geçersiz token.";
+
         return res.status(401).json({
             success: false,
-            message: "Geçersiz veya süresi dolmuş token.",
+            message,
         });
     }
 };
