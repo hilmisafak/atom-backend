@@ -5,6 +5,21 @@ const uploadPhoto = async (req, res) => {
     try {
         const { title, description, category } = req.body;
 
+        // Başlık ve kategori validasyonu
+        if (!title || title.trim() === "") {
+            return res.status(400).json({
+                success: false,
+                message: "Başlık gerekli.",
+            });
+        }
+
+        if (!category || category.trim() === "") {
+            return res.status(400).json({
+                success: false,
+                message: "Kategori gerekli.",
+            });
+        }
+
         if (!req.file) {
             return res.status(400).json({
                 success: false,
@@ -20,9 +35,9 @@ const uploadPhoto = async (req, res) => {
         });
 
         const photo = await Photo.create({
-            title,
+            title: title.trim(),
             description,
-            category,
+            category: category.trim(),
             imageUrl: result.secure_url,
             publicId: result.public_id,
         });
@@ -101,9 +116,29 @@ const updatePhoto = async (req, res) => {
             });
         }
 
-        photo.title = title ?? photo.title;
+        // Başlık validasyonu
+        if (title !== undefined && title !== null) {
+            if (title.trim() === "") {
+                return res.status(400).json({
+                    success: false,
+                    message: "Başlık boş olamaz.",
+                });
+            }
+            photo.title = title.trim();
+        }
+
+        // Kategori validasyonu
+        if (category !== undefined && category !== null) {
+            if (category.trim() === "") {
+                return res.status(400).json({
+                    success: false,
+                    message: "Kategori boş olamaz.",
+                });
+            }
+            photo.category = category.trim();
+        }
+
         photo.description = description ?? photo.description;
-        photo.category = category ?? photo.category;
 
         const updatedPhoto = await photo.save();
 
