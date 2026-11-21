@@ -31,6 +31,10 @@ const uploadPhoto = async (req, res) => {
     const result = await cloudinary.uploader.upload(base64Image, {
       folder: "atom-oto/gallery",
       resource_type: "image",
+      // Depolama kotasını korumak için orijinali en fazla 2000px ve iyi kalitede sakla
+      transformation: [
+        { width: 2000, height: 2000, crop: "limit", quality: "auto:good" },
+      ],
     });
 
     const photo = await Photo.create({
@@ -167,6 +171,9 @@ const updatePhoto = async (req, res) => {
       const result = await cloudinary.uploader.upload(base64Image, {
         folder: "atom-oto/gallery",
         resource_type: "image",
+        transformation: [
+          { width: 2000, height: 2000, crop: "limit", quality: "auto:good" },
+        ],
       });
 
       await cloudinary.uploader.destroy(photo.publicId);
